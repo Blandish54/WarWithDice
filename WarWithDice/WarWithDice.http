@@ -1,0 +1,6 @@
+@WarWithDice_HostAddress = http://localhost:5074
+
+GET {{WarWithDice_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
