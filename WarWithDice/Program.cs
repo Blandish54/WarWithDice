@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using WarWithDice.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<CurrentGame>();
+
+var section = builder.Configuration.GetSection("ConnectionStrings");
+
+builder.Services.Configure<ConnectionStrings>(section);
+builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<ConnectionStrings>>().Value);
 
 var app = builder.Build();
 

@@ -10,6 +10,6 @@
 
         public int TotalRounds { get; set; }
 
-        public string Winner {  get; set; }
+        public required string Winner {  get; set; }
     }
 }

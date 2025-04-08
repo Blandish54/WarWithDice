@@ -17,6 +17,6 @@ namespace WarWithDice.Models
 
         public List<int> ComputerCardsPlayed { get; set; } = new List<int>();
 
-        public string WarWinner { get; set; }
+        public required string WarWinner { get; set; }
     }
 }

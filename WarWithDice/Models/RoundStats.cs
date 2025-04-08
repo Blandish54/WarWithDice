@@ -12,7 +12,7 @@
 
         public int ComputerRoll { get; set; }
 
-        public string RoundResult { get; set; }
+        public required string RoundResult { get; set; }
 
         public bool IsWar {  get; set; }
 
