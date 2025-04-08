@@ -69,55 +69,53 @@ namespace WarWithDice.Controllers
             return Ok(currentGame);
         }
 
-        //2. Text stash your list of things
-        //3. Write the code to play a round
-        //4. Return the winner and each players card as a message to the user
+        //2. Change the message to user to show the dice values
 
-
-        //1. Write a list of things to do in the order to do them
         [Route("PlayRound")]
         [HttpGet]
         public IActionResult PlayRound()
         {
-            //Both players play the card from the top of their deck and the cardRank
-            Card playerOneCard = currentGame.playerOneDeck[0];
+            Random random = new Random();
 
-            var playerOneCardRank = currentGame.playerOneDeck[0].CardRank;
-            var playerOneCardFace = currentGame.playerOneDeck[0].FaceValue;
-            var playerOneCardSuit = currentGame.playerOneDeck[0].CardSuit;
-            var playerOneCardDisplayName = currentGame.playerOneDeck[0].DisplayName;
+            var playerOneDiceRoll = random.Next(0, 7);
 
-            Card playerTwoCard = currentGame.playerTwoDeck[0];
+            var playerTwoDiceRoll = random.Next(0, 7);
 
-            var playerTwoCardRank = currentGame.playerTwoDeck[0].CardRank;
-            var playerCarTwodFace = currentGame.playerTwoDeck[0].FaceValue;
-            var playerTwoCardSuit = currentGame.playerTwoDeck[0].CardSuit;
-            var playerTwoCardDisplayName = currentGame.playerTwoDeck[0].DisplayName;
+            Card playerOneCard = currentGame.playerOneDeck.First();
 
-            //Compare the two values of the cards and determine the result of the round (winner/loser or War)
+            Card playerTwoCard = currentGame.playerTwoDeck.First();
+
             bool isWar = false;
 
-            string winnerMessage = ("");
-
-            if (playerOneCardRank > playerTwoCardRank)
+            if (playerOneDiceRoll > playerTwoDiceRoll)
             {
-                winnerMessage = ($"Player One won the hand a {playerOneCardDisplayName} vs. a {playerTwoCardDisplayName}");
-
-                currentGame.playerOneDeck.Add(currentGame.playerOneDeck[0]);
-                currentGame.playerOneDeck.Add(currentGame.playerTwoDeck[0]);
                 currentGame.playerTwoDeck.RemoveAt(0);
-
-            }
-            
-            if (playerTwoCardRank > playerOneCardRank)
-            {
-                winnerMessage = ($"Player Two won the hand a {playerTwoCardDisplayName} vs. a {playerOneCardDisplayName}");
-
-                currentGame.playerTwoDeck.Add(currentGame.playerTwoDeck[0]);
-                currentGame.playerTwoDeck.Add(currentGame.playerOneDeck[0]);
+                
+                currentGame.playerOneDeck.Add(playerTwoCard);
                 currentGame.playerOneDeck.RemoveAt(0);
+                currentGame.playerOneDeck.Add(playerOneCard);
+                
+                return Ok($@"Player One won the round, without War 
+                {playerOneCard.DisplayName} vs. {playerTwoCard.DisplayName}
+                Player One's deck has {currentGame.playerOneDeck.Count()} card(s)
+                Player Two's deck has {currentGame.playerTwoDeck.Count()} card(s)");
+                               
             }
-            
+
+            if (playerTwoDiceRoll > playerOneDiceRoll)
+            {
+                currentGame.playerOneDeck.RemoveAt(0);
+                
+                currentGame.playerTwoDeck.Add(playerTwoCard);
+                currentGame.playerTwoDeck.RemoveAt(0);
+                currentGame.playerTwoDeck.Add(playerOneCard);
+                
+
+                return Ok($@"Player Two won the round, without War 
+                {playerTwoCard.DisplayName} vs. {playerOneCard.DisplayName}
+                Player One's deck has {currentGame.playerOneDeck.Count()} card(s)
+                Player Two's deck has {currentGame.playerTwoDeck.Count()} card(s)");
+            }
             else
             {
                 isWar = true;
@@ -125,66 +123,57 @@ namespace WarWithDice.Controllers
             
             List<Card> warDeckPlayerOne = new List<Card>();
             List<Card> warDeckPlayerTwo = new List<Card>();
+
+            currentGame.playerOneDeck.RemoveAt(0);
+            warDeckPlayerOne.Add(playerOneCard);
+
+            currentGame.playerTwoDeck.RemoveAt(0);
+            warDeckPlayerTwo.Add(playerTwoCard);
             
+
+            // If there is not a card at the index position it throws an error
+            // check to see if the cards are there before trying to pull them
+            
+            //Look at React
+           
             while (isWar)
             {
-                int warCounter = 1;
+                int warCounter = 0;
 
-                while (warCounter <= 5)
+                while (warCounter < 4)
                 {
                     playerOneCard = currentGame.playerOneDeck[warCounter];
-
-                    playerOneCardRank = currentGame.playerOneDeck[warCounter].CardRank;
-                    playerOneCardFace = currentGame.playerOneDeck[warCounter].FaceValue;
-                    playerOneCardSuit = currentGame.playerOneDeck[warCounter].CardSuit;
-                    playerOneCardDisplayName = currentGame.playerOneDeck[warCounter].DisplayName;
-
+                    currentGame.playerOneDeck.RemoveAt(warCounter);
                     warDeckPlayerOne.Add(playerOneCard);
 
                     playerTwoCard = currentGame.playerTwoDeck[warCounter];
-
-                    playerTwoCardRank = currentGame.playerTwoDeck[warCounter].CardRank;
-                    playerCarTwodFace = currentGame.playerTwoDeck[warCounter].FaceValue;
-                    playerTwoCardSuit = currentGame.playerTwoDeck[warCounter].CardSuit;
-                    playerTwoCardDisplayName = currentGame.playerTwoDeck[warCounter].DisplayName;
-
+                    currentGame.playerTwoDeck.RemoveAt(warCounter);
                     warDeckPlayerTwo.Add(playerTwoCard);
 
                     warCounter++;
                 }
                 
                 
-                if (playerOneCardRank > playerTwoCardRank)
+                if (warDeckPlayerOne.Last().CardRank > warDeckPlayerTwo.Last().CardRank)
                 {
-                    foreach (Card card in warDeckPlayerOne)
-                    {
-                        currentGame.playerOneDeck.Add(card);
-                    }
-                    foreach (Card card in warDeckPlayerTwo)
-                    {
-                        currentGame.playerOneDeck.Add(card);
-                    }
-
-                    winnerMessage = ($"Player One won the hand a {playerOneCardDisplayName} vs. a {playerTwoCardDisplayName}");
-
-                    isWar = false;
+                    currentGame.playerOneDeck.AddRange(warDeckPlayerOne);
+                    currentGame.playerOneDeck.AddRange(warDeckPlayerTwo);
+                    
+                    return Ok($@"Player One won the War with 
+                    {warDeckPlayerTwo.Last().DisplayName} vs. {warDeckPlayerOne.Last().DisplayName}
+                    Player One deck has {currentGame.playerOneDeck.Count} 
+                    Player Two deck has {currentGame.playerTwoDeck.Count}");
                 }
                 
-                
-                if (playerTwoCardRank > playerOneCardRank)
+                if (playerTwoCard.CardRank > playerOneCard.CardRank)
                 {
-                    foreach (Card card in warDeckPlayerTwo)
-                    {
-                        currentGame.playerTwoDeck.Add(card);
-                    }
-                    foreach (Card card in warDeckPlayerOne)
-                    {
-                        currentGame.playerTwoDeck.Add(card);
-                    }
+                    currentGame.playerTwoDeck.AddRange(warDeckPlayerOne);
+                    currentGame.playerTwoDeck.AddRange(warDeckPlayerTwo);
 
-                    winnerMessage = ($"Player Two won the hand a {playerTwoCardDisplayName} vs. a {playerOneCardDisplayName}");
-
-                    isWar = false;
+                    return Ok($@"Player One won the War with 
+                    {warDeckPlayerTwo.Last().DisplayName} vs. {warDeckPlayerOne.Last().DisplayName}
+                    Player One deck has {currentGame.playerOneDeck.Count} 
+                    Player Two deck has {currentGame.playerTwoDeck.Count}");
                 }
                 else 
                 {
@@ -192,7 +181,7 @@ namespace WarWithDice.Controllers
                 }
             }
 
-            return Ok(winnerMessage);//Return your result here
+            return Ok();
         }
-    }
+    } 
 }

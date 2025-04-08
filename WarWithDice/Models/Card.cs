@@ -4,11 +4,13 @@ namespace WarWithDice.Models
 {
     public class Card
     {
-        //public int CardId { get; set; }
+        public int CardId { get; set; }
 
-        public string FaceValue { get; set; }
+        public int CardValue { get; set; }
 
-        public string CardSuit { get; set; }
+        public string FaceValue { get; set; } = "";
+
+        public string CardSuit { get; set; } = "";
 
         public int CardRank { get; set; }
 
@@ -30,22 +32,11 @@ namespace WarWithDice.Models
             CardValue = CardValue;
         }
 
-        //public List<Card> Cards { get; set; }
-
-        //public static Random Random = new Random();
-
-        //public static void Shuffle<Card>(this List<Card> cards)
-        //{
-        //    int n = cards.Count;
-        //    while (n > 1)
-        //    {
-        //        n--;
-        //        int k = Random.Next(n + 1);
-        //        Card value = cards[k];
-        //        cards[k] = cards[n];
-        //        cards[n] = value;
-        //    }
-        //}
+        public Card(string faceValue, string cardSuit)
+        {
+            this.FaceValue = faceValue;
+            this.CardSuit = cardSuit;
+        }
 
     }
 }
