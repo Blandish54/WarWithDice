@@ -1,9 +1,9 @@
-﻿using WarWithDice.Controllers;
-using WarWithDice.Models;
+﻿using WarWithDice.Server.Controllers;
+using WarWithDice.Server.Models;
 using System.Collections;
 using System.Runtime.CompilerServices;
 
-namespace WarWithDice.Models
+namespace WarWithDice.Server.Models
 {
     //I think that controllers can only work with one other controller? 
     //So I think that I need to have this controller work with the game controller

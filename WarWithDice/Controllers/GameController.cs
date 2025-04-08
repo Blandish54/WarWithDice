@@ -2,9 +2,9 @@
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc;
-using WarWithDice.Models;
+using WarWithDice.Server.Models;
 
-namespace WarWithDice.Controllers
+namespace WarWithDice.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -145,7 +145,7 @@ namespace WarWithDice.Controllers
                     playerOneCard = currentGame.playerOneDeck[warCounter];
                     currentGame.playerOneDeck.RemoveAt(warCounter);
                     warDeckPlayerOne.Add(playerOneCard);
-
+                    //Error when war counter reached 9, array said capacity 16
                     playerTwoCard = currentGame.playerTwoDeck[warCounter];
                     currentGame.playerTwoDeck.RemoveAt(warCounter);
                     warDeckPlayerTwo.Add(playerTwoCard);

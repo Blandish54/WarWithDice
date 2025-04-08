@@ -1,4 +1,4 @@
-namespace WarWithDice
+namespace WarWithDice.Server
 {
     public class WeatherForecast
     {

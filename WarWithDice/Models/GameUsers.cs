@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace WarWithDice.Models
+namespace WarWithDice.Server.Models
 {
     public class GameUsers
     {

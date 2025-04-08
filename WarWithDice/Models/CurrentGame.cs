@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WarWithDice.Models
+namespace WarWithDice.Server.Models
 {
     public class CurrentGame
     {

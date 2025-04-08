@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace WarWithDice.Models
+namespace WarWithDice.Server.Models
 {
     public class Card
     {

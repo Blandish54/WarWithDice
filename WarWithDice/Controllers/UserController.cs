@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using WarWithDice.Models;
+using WarWithDice.Server.Models;
 
-namespace WarWithDice.Controllers
+namespace WarWithDice.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
