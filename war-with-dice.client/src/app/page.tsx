@@ -1,7 +1,9 @@
 'use client'
 
-import React, { MouseEventHandler } from "react";
-import { useState } from "react";
+import React, { MouseEventHandler } from 'react';
+import { useState } from 'react';
+import { CreateGameUserRequest } from "./models/CreateGameUserRequest";
+import axios from 'axios';
 
 ///First and foremost a form
 ///
@@ -20,8 +22,34 @@ export default function HomePage() {
 
   const [colorSelection, setColorSelection] = useState('');
 
+  const [firstName, setFirstName] = useState<string>('');
+
+  const [lastName, setLastName] = useState<string>('');
+  
+  const [luckyNumber, setLuckyNumber] = useState<number>(0);
+  /// Client side validation capture the input for other 2 boxes
+  /// 
+
+  function test(){
+    
+  }
+
   function handleColorSelection (event: React.MouseEvent<HTMLButtonElement>){
     setColorSelection(colorSelection);
+  };
+
+  function handleFirstNameChange(event: React.ChangeEvent<HTMLInputElement>){
+    
+    setFirstName(event.target.value);
+    console.log(`firstName: ${firstName}`);
+  };
+
+  function handleSaveClick (event: React.MouseEvent<HTMLButtonElement>){
+    
+    
+    
+    const userName:string = `${firstName}${lastName}${luckyNumber}`;
+    axios.post(`https://localhost:7299/GameUser/Add/${userName}`);
   };
 
   
@@ -35,7 +63,7 @@ export default function HomePage() {
           <div className="sm:col-span-3">
             <label htmlFor="first-name" className="block text-sm/6 font-medium text-gray-900">First name</label>
             <div className="mt-2">
-              <input type="text" name="first-name" id="first-name" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+              <input type="text" name="first-name" id="first-name" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" onChange={handleFirstNameChange} value={firstName}>
               </input>
             </div>
           </div>
@@ -69,8 +97,8 @@ export default function HomePage() {
     
   
     <div className="mt-6 flex items-center justify-end gap-x-6">
-      <button type="button" className="text-sm/6 font-semibold text-gray-900">Cancel</button>
-      <button type="submit" className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+      <button onClick={test} type="button" className="text-sm/6 font-semibold text-gray-900">Cancel</button>
+      <button type="submit" onClick={handleSaveClick} className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
     </div>
   </form>
   );
