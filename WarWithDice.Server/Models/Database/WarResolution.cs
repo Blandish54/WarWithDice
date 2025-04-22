@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace WarWithDice.Server.Models
+namespace WarWithDice.Server.Models.Database
 {
     public class WarResolution
     {

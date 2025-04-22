@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc;
 using WarWithDice.Server.Models;
+using WarWithDice.Server.Models.Database;
 
 namespace WarWithDice.Server.Controllers
 {

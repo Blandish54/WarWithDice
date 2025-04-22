@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace WarWithDice.Server.Models
+namespace WarWithDice.Server.Models.Database
 {
     public class GameUsers
     {
@@ -24,15 +24,15 @@ namespace WarWithDice.Server.Models
 
         public int TotalGames => GamesWon + GamesLost;
 
-        public double WinPercentage => TotalGames == 0 ? 0 : (GamesWon / (double)TotalGames) * 100;
+        public double WinPercentage => TotalGames == 0 ? 0 : GamesWon / (double)TotalGames * 100;
 
         public int TotalWars => WarsWon + WarsLost;
 
-        public double WarWinPercentage => TotalWars == 0 ? 0 : (WarsWon / (double)TotalWars) * 100;
+        public double WarWinPercentage => TotalWars == 0 ? 0 : WarsWon / (double)TotalWars * 100;
 
         public int TotalRounds => RoundsWon + RoundsLost;
 
-        public double RoundWinPercentage => TotalRounds == 0 ? 0 : (RoundsWon / (double)TotalRounds) * 100;
+        public double RoundWinPercentage => TotalRounds == 0 ? 0 : RoundsWon / (double)TotalRounds * 100;
 
     }
 }

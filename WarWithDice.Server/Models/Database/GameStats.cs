@@ -1,4 +1,4 @@
-﻿namespace WarWithDice.Server.Models
+﻿namespace WarWithDice.Server.Models.Database
 {
     public class GameStats
     {
@@ -10,6 +10,6 @@
 
         public int TotalRounds { get; set; }
 
-        public required string Winner {  get; set; }
+        public required string Winner { get; set; }
     }
 }

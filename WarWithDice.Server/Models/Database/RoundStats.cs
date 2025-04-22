@@ -1,4 +1,4 @@
-﻿namespace WarWithDice.Server.Models
+﻿namespace WarWithDice.Server.Models.Database
 {
     public class RoundStats
     {
@@ -14,7 +14,7 @@
 
         public required string RoundResult { get; set; }
 
-        public bool IsWar {  get; set; }
+        public bool IsWar { get; set; }
 
     }
 }

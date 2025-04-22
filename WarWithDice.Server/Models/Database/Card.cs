@@ -1,7 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace WarWithDice.Server.Models
+namespace WarWithDice.Server.Models.Database
 {
+    /// Gonna need to be split into seperate classes at some point
+    
     public class Card
     {
         public int CardId { get; set; }
@@ -34,8 +36,8 @@ namespace WarWithDice.Server.Models
 
         public Card(string faceValue, string cardSuit)
         {
-            this.FaceValue = faceValue;
-            this.CardSuit = cardSuit;
+            FaceValue = faceValue;
+            CardSuit = cardSuit;
         }
 
     }

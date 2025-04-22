@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using WarWithDice.Server.Models;
+using WarWithDice.Server.Models.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 

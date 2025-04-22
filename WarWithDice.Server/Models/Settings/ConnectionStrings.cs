@@ -1,5 +1,4 @@
-﻿
-namespace WarWithDice.Server.Models
+﻿namespace WarWithDice.Server.Models.Settings
 {
     public class ConnectionStrings
     {

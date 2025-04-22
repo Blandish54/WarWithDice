@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using WarWithDice.Server.Models.Database;
 
 namespace WarWithDice.Server.Models
 {

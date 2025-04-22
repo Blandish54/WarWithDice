@@ -24,7 +24,7 @@ export default function HomePage() {
     setColorSelection(colorSelection);
   };
 
-  }
+  
   return (
     <form>
       <div className="border-b border-gray-900/10 pb-12">

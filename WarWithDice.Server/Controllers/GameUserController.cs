@@ -1,17 +1,17 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using WarWithDice.Server.Models;
+using WarWithDice.Server.Models.Settings;
 
 namespace WarWithDice.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController : Controller
+    public class GameUserController : Controller
     {
         private readonly ConnectionStrings connectionStrings;
 
-        public UserController(ConnectionStrings connectionStrings)
+        public GameUserController(ConnectionStrings connectionStrings)
         {
             this.connectionStrings = connectionStrings;
         }
