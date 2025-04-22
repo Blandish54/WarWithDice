@@ -29,7 +29,7 @@ namespace WarWithDice.Server.Controllers
 
             string[] faceValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
             string[] cardSuits = { "Hearts", "Diamonds", "Clubs", "Spades" };
-
+            //When CardRank is set during the creation the 2s rank from 0 to 3 and so on for the rest
             foreach (string faceValue in faceValues)
             {
                 foreach (var cardSuit in cardSuits)
@@ -77,9 +77,9 @@ namespace WarWithDice.Server.Controllers
         {
             Random random = new Random();
 
-            var playerOneDiceRoll = random.Next(0, 7);
+            var playerOneDiceRoll = random.Next(1, 7);
 
-            var playerTwoDiceRoll = random.Next(0, 7);
+            var playerTwoDiceRoll = random.Next(1, 7);
 
             Card playerOneCard = currentGame.playerOneDeck.First();
 
@@ -96,7 +96,7 @@ namespace WarWithDice.Server.Controllers
                 currentGame.playerOneDeck.Add(playerOneCard);
                 
                 return Ok($@"Player One won the round, without War 
-                {playerOneCard.DisplayName} vs. {playerTwoCard.DisplayName}
+                {playerOneDiceRoll} vs. {playerTwoDiceRoll}
                 Player One's deck has {currentGame.playerOneDeck.Count()} card(s)
                 Player Two's deck has {currentGame.playerTwoDeck.Count()} card(s)");
                                
@@ -112,7 +112,7 @@ namespace WarWithDice.Server.Controllers
                 
 
                 return Ok($@"Player Two won the round, without War 
-                {playerTwoCard.DisplayName} vs. {playerOneCard.DisplayName}
+                {playerTwoDiceRoll} vs. {playerOneDiceRoll}
                 Player One's deck has {currentGame.playerOneDeck.Count()} card(s)
                 Player Two's deck has {currentGame.playerTwoDeck.Count()} card(s)");
             }

@@ -21,8 +21,6 @@ namespace WarWithDice.Server.Controllers
 
         //Look into Axios will communicate with the API/Axios/Netsend
 
-        //Create a basic webpage with React, watch more tutorials and play around with simple buttons
-
         [Route("AllUsers")]
         [HttpGet]
         public IActionResult GetAllUsers()
