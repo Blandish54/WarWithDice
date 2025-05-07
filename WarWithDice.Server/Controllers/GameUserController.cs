@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using WarWithDice.Server.Models.ClientAPIs;
 using WarWithDice.Server.Models.Settings;
 
 namespace WarWithDice.Server.Controllers
@@ -19,7 +20,12 @@ namespace WarWithDice.Server.Controllers
 
         //Look at SQL Joins // Build this Flu Shots Dashboard with SQL and Tableau! on youtube
 
-        //Look into Axios will communicate with the API/Axios/Netsend
+        //Create SQL migration
+
+        //Expand SQL knowledge Stored Procedures
+
+        //Make the dice be 5 of each, d4 d6 d8 d12.
+
 
         [Route("AllUsers")]
         [HttpGet]
@@ -90,13 +96,15 @@ namespace WarWithDice.Server.Controllers
             }
         }
 
-        [Route("Add/{userName}")]
+        [Route("Add")]
         [HttpPost]
-        public IActionResult AddUser(string userName)
+        public IActionResult AddUser(GameUserModel gameUserModel)
         {
             using (var connectionToAddUser = new SqlConnection(connectionStrings.GameDbConnectionString))
             {
-                string addUserQuery = "INSERT INTO GameUsers(UserName) VALUES (@UserName)";
+                string userName = gameUserModel.FirstName.First() + gameUserModel.LastName + gameUserModel.LuckyNumber;
+
+                string addUserQuery = "INSERT INTO GameUsers(UserName, LuckyNumber, ColorSelection, FirstName, LastName, ColorCode) VALUES (@UserName, @LuckyNumber, @ColorSelection, @FirstName, @LastName, @ColorCode)";
 
                 connectionToAddUser.Open();
 
@@ -104,20 +112,29 @@ namespace WarWithDice.Server.Controllers
 
                 using (SqlCommand commandAddUser = new SqlCommand(addUserQuery, connectionToAddUser))
                 {
-                    commandAddUser.Parameters.AddWithValue("UserName", userName);
+                    commandAddUser.Parameters.AddWithValue("@UserName", userName);
+
+                    commandAddUser.Parameters.AddWithValue("@LuckyNumber", gameUserModel.LuckyNumber);
+
+                    commandAddUser.Parameters.AddWithValue("@ColorSelection", gameUserModel.ColorSelection);
+
+                    commandAddUser.Parameters.AddWithValue("@FirstName", gameUserModel.FirstName);
+
+                    commandAddUser.Parameters.AddWithValue("@LastName", gameUserModel.LastName);
+
+                    commandAddUser.Parameters.AddWithValue("@ColorCode", gameUserModel.ColorCode);
 
                     int rowsAffected = commandAddUser.ExecuteNonQuery();
 
                     if (rowsAffected > 0)
                     {
-                        creationOutcome = "The User was added succesfully";
+                        return Ok("Game User was created");
                     }
                     else
                     {
-                        creationOutcome = "The User was not added";
+                        return Ok ("Game User was not added");
                     }
                 }
-                return Ok(creationOutcome);
             }
         }
         

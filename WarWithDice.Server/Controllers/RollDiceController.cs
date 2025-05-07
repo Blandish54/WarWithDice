@@ -10,7 +10,7 @@ namespace WarWithDice.Server.Controllers
         public int Get()
         {
             int Test = 5;
-            
+
             return Test;
         }
     }

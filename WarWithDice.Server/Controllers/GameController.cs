@@ -18,6 +18,41 @@ namespace WarWithDice.Server.Controllers
             this.currentGame = currentGame;
         }
 
+        //Current issue is that I have dice in the main dice bag but I only have 4 of each kind and I would like to have 5
+        //Most likely need to break up the foreach loops or make a 4 loop for the .Add and just use the foreach to set the 
+        //properties.
+        
+        [Route("CreateDiceDeck")]
+        [HttpGet]
+        public IActionResult CreateDiceDeck()
+        {
+            currentGame.playerOneDiceDeck.Clear();
+            currentGame.playerTwoDiceDeck.Clear();
+
+            List<Die> mainDieBag = new List<Die>();
+
+            int[] numberOfSides = { 4, 6, 8, 12 };
+            string[] dieNames = { "d4", "d6", "d8", "d12" };
+
+            foreach (string dieName in dieNames)
+            {
+                foreach (int number in numberOfSides)
+                {
+                    var die = new Die(dieName, number);
+
+                    mainDieBag.Add(die);
+                    
+                }
+            }
+            
+            return Ok(mainDieBag);
+        }
+
+
+
+
+
+
 
         [Route("CreateDeck")]
         [HttpGet]
@@ -31,15 +66,16 @@ namespace WarWithDice.Server.Controllers
             string[] faceValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
             string[] cardSuits = { "Hearts", "Diamonds", "Clubs", "Spades" };
             //When CardRank is set during the creation the 2s rank from 0 to 3 and so on for the rest
+            
+            
+
             foreach (string faceValue in faceValues)
             {
                 foreach (var cardSuit in cardSuits)
                 {
-                    var card = new Card();
+                    var cardRank = Array.IndexOf(faceValues, faceValue);
 
-                    card.FaceValue = faceValue;
-                    card.CardRank = Array.IndexOf(faceValues, faceValue);
-                    card.CardSuit = cardSuit;
+                    var card = new Card(cardRank, cardSuit, faceValue );
 
                     deck.Add(card);
                 }

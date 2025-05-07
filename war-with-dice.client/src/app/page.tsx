@@ -3,7 +3,7 @@
 import React, { MouseEventHandler } from 'react';
 import { useState } from 'react';
 import { CreateGameUserRequest } from "./models/CreateGameUserRequest";
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 
 export default function HomePage() {
@@ -17,16 +17,15 @@ export default function HomePage() {
   const [lastName, setLastName] = useState<string>('');
   
   const [luckyNumber, setLuckyNumber] = useState<number>(0);
-  /// Client side validation 
-
+  
   const allowedCharacters = /^[A-Za-z\s'-]+$/;
 
   function test(){
     
   };
 
-  function handleColorSelection (color: string){
-    setColorSelection(color);
+  function handleColorSelection (event: React.MouseEvent<HTMLButtonElement>){
+    setColorSelection((event.currentTarget as HTMLButtonElement).value);
   };
 
   function handleFirstNameChange(event: React.ChangeEvent<HTMLInputElement>){
@@ -40,7 +39,8 @@ export default function HomePage() {
   };
 
   function handleLuckyNumberChange(event: React.ChangeEvent<HTMLInputElement>){
-    setLuckyNumber(event.target.value as any);
+    const luckyNumber: number = parseInt(event.target.value);
+    setLuckyNumber(luckyNumber);
   };
 
   function handleSaveClick (event: React.MouseEvent<HTMLButtonElement>){
@@ -50,19 +50,37 @@ export default function HomePage() {
     if(!firstName.trim()) {
       errors.firstName = "First name is required";
     }
-    else if(allowedCharacters.test(firstName.trim())){
+    else if(!allowedCharacters.test(firstName.trim())){
       errors.firstName = "First name must only contain letters, hyphens and spaces.";
     }
 
-    if(!firstName.trim()) {
+    if(!lastName.trim()) {
       errors.lastName = "Last name is required";
     }
-    else if(allowedCharacters.test(firstName.trim())){
+    else if(!allowedCharacters.test(lastName.trim())){
       errors.lastName = "Last name must only contain letters, hyphens and spaces.";
     }
     
     const userName: string = `${firstInitial}${lastName}${luckyNumber}`;
-    axios.post(`https://localhost:7299/GameUser/Add/${userName}`);
+    let gameUser: CreateGameUserRequest = {
+      firstName: firstName,
+      lastName: lastName,
+      colorSelection: selectedColor,
+      userName: userName,
+      colorCode: '#000000',
+      luckyNumber: luckyNumber
+    }
+
+    try{
+      axios.post('https://localhost:7299/GameUser/Add', gameUser);
+    }
+    catch(error) {
+      if(axios.isAxiosError(error)){
+        const axiosError = error as AxiosError
+
+        console.log('Axios Error:' + axiosError.message)
+      }
+    }
   };
 
   
@@ -108,7 +126,8 @@ export default function HomePage() {
         <button
           type='button'
           key={color}
-          onClick={() => handleColorSelection(color)}
+          value={color}
+          onClick={handleColorSelection}
           className={`w-40 h-40 rounded-full border-2 ${
             selectedColor === color ? "border-black" : "border-transparent"
           }`}
@@ -125,7 +144,7 @@ export default function HomePage() {
       </div>
     <div className="mt-6 flex items-center justify-end gap-x-6">
       <button onClick={test} type="button" className="text-sm/6 font-semibold text-gray-900">Cancel</button>
-      <button type="submit" onClick={handleSaveClick} className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+      <button onClick={handleSaveClick} className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
     </div>
   </form>
   );

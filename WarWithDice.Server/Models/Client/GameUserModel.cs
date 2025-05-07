@@ -1,4 +1,6 @@
-﻿namespace WarWithDice.Server.Models.ClientAPIs
+﻿using System.Drawing;
+
+namespace WarWithDice.Server.Models.ClientAPIs
 {
     public class GameUserModel
     {
@@ -8,5 +10,8 @@
 
         public int LuckyNumber { get; set; }
 
+        public string ColorSelection { get; set; }
+
+        public string ColorCode { get; set; }
     }
 }

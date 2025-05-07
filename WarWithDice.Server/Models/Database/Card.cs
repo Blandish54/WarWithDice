@@ -6,9 +6,7 @@ namespace WarWithDice.Server.Models.Database
     
     public class Card
     {
-        public int CardId { get; set; }
-
-        public int CardValue { get; set; }
+        public int CardId;
 
         public string FaceValue { get; set; } = "";
 
@@ -23,22 +21,14 @@ namespace WarWithDice.Server.Models.Database
 
         }
 
-        public Card(int CardId, string CardRank, string CardSuit, int CardValue)
+        public Card( int cardRank, string cardSuit, string faceValue)
         {
-            CardId = CardId;
+           
+            CardRank = cardRank;
 
-            CardRank = CardRank;
-
-            CardSuit = CardSuit;
-
-            CardValue = CardValue;
-        }
-
-        public Card(string faceValue, string cardSuit)
-        {
-            FaceValue = faceValue;
             CardSuit = cardSuit;
+            
+            FaceValue = faceValue;
         }
-
     }
 }
