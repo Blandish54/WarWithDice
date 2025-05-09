@@ -18,10 +18,8 @@ namespace WarWithDice.Server.Controllers
             this.currentGame = currentGame;
         }
 
-        //Current issue is that I have dice in the main dice bag but I only have 4 of each kind and I would like to have 5
-        //Most likely need to break up the foreach loops or make a 4 loop for the .Add and just use the foreach to set the 
-        //properties.
-        
+        //Next steps are to split the main deck into the indivdual playerDecks
+
         [Route("CreateDiceDeck")]
         [HttpGet]
         public IActionResult CreateDiceDeck()
@@ -31,27 +29,24 @@ namespace WarWithDice.Server.Controllers
 
             List<Die> mainDieBag = new List<Die>();
 
-            int[] numberOfSides = { 4, 6, 8, 12 };
-            string[] dieNames = { "d4", "d6", "d8", "d12" };
+            int[] numberOfSides = { 4, 6, 8, 20 };
+            string[] dieNames = { "d4", "d6", "d8", "d20" };
+
+            var counter = 0;
 
             foreach (string dieName in dieNames)
             {
-                foreach (int number in numberOfSides)
+                for (int i = 0; i < 10; i++)
                 {
-                    var die = new Die(dieName, number);
+                    var die = new Die(dieName, numberOfSides[counter]);
 
                     mainDieBag.Add(die);
-                    
                 }
+                counter++;
             }
-            
+
             return Ok(mainDieBag);
         }
-
-
-
-
-
 
 
         [Route("CreateDeck")]
@@ -66,8 +61,8 @@ namespace WarWithDice.Server.Controllers
             string[] faceValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
             string[] cardSuits = { "Hearts", "Diamonds", "Clubs", "Spades" };
             //When CardRank is set during the creation the 2s rank from 0 to 3 and so on for the rest
-            
-            
+
+
 
             foreach (string faceValue in faceValues)
             {
@@ -75,7 +70,7 @@ namespace WarWithDice.Server.Controllers
                 {
                     var cardRank = Array.IndexOf(faceValues, faceValue);
 
-                    var card = new Card(cardRank, cardSuit, faceValue );
+                    var card = new Card(cardRank, cardSuit, faceValue);
 
                     deck.Add(card);
                 }
@@ -127,26 +122,26 @@ namespace WarWithDice.Server.Controllers
             if (playerOneDiceRoll > playerTwoDiceRoll)
             {
                 currentGame.playerTwoDeck.RemoveAt(0);
-                
+
                 currentGame.playerOneDeck.Add(playerTwoCard);
                 currentGame.playerOneDeck.RemoveAt(0);
                 currentGame.playerOneDeck.Add(playerOneCard);
-                
+
                 return Ok($@"Player One won the round, without War 
                 {playerOneDiceRoll} vs. {playerTwoDiceRoll}
                 Player One's deck has {currentGame.playerOneDeck.Count()} card(s)
                 Player Two's deck has {currentGame.playerTwoDeck.Count()} card(s)");
-                               
+
             }
 
             if (playerTwoDiceRoll > playerOneDiceRoll)
             {
                 currentGame.playerOneDeck.RemoveAt(0);
-                
+
                 currentGame.playerTwoDeck.Add(playerTwoCard);
                 currentGame.playerTwoDeck.RemoveAt(0);
                 currentGame.playerTwoDeck.Add(playerOneCard);
-                
+
 
                 return Ok($@"Player Two won the round, without War 
                 {playerTwoDiceRoll} vs. {playerOneDiceRoll}
@@ -157,7 +152,7 @@ namespace WarWithDice.Server.Controllers
             {
                 isWar = true;
             }
-            
+
             List<Card> warDeckPlayerOne = new List<Card>();
             List<Card> warDeckPlayerTwo = new List<Card>();
 
@@ -166,13 +161,13 @@ namespace WarWithDice.Server.Controllers
 
             currentGame.playerTwoDeck.RemoveAt(0);
             warDeckPlayerTwo.Add(playerTwoCard);
-            
+
 
             // If there is not a card at the index position it throws an error
             // check to see if the cards are there before trying to pull them
-            
+
             //Look at React
-           
+
             while (isWar)
             {
                 int warCounter = 0;
@@ -189,19 +184,19 @@ namespace WarWithDice.Server.Controllers
 
                     warCounter++;
                 }
-                
-                
+
+
                 if (warDeckPlayerOne.Last().CardRank > warDeckPlayerTwo.Last().CardRank)
                 {
                     currentGame.playerOneDeck.AddRange(warDeckPlayerOne);
                     currentGame.playerOneDeck.AddRange(warDeckPlayerTwo);
-                    
+
                     return Ok($@"Player One won the War with 
                     {warDeckPlayerTwo.Last().DisplayName} vs. {warDeckPlayerOne.Last().DisplayName}
                     Player One deck has {currentGame.playerOneDeck.Count} 
                     Player Two deck has {currentGame.playerTwoDeck.Count}");
                 }
-                
+
                 if (playerTwoCard.CardRank > playerOneCard.CardRank)
                 {
                     currentGame.playerTwoDeck.AddRange(warDeckPlayerOne);
@@ -212,7 +207,7 @@ namespace WarWithDice.Server.Controllers
                     Player One deck has {currentGame.playerOneDeck.Count} 
                     Player Two deck has {currentGame.playerTwoDeck.Count}");
                 }
-                else 
+                else
                 {
                     isWar = true;
                 }
@@ -220,5 +215,5 @@ namespace WarWithDice.Server.Controllers
 
             return Ok();
         }
-    } 
+    }
 }
