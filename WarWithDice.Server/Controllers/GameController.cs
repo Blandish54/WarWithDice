@@ -18,7 +18,7 @@ namespace WarWithDice.Server.Controllers
             this.currentGame = currentGame;
         }
 
-        //Next steps are to split the main deck into the indivdual playerDecks
+        //Returning currentGame.playerOneDeck ATM for testing purposes, need to return currentGame in the future
 
         [Route("CreateDiceDeck")]
         [HttpGet]
@@ -45,7 +45,25 @@ namespace WarWithDice.Server.Controllers
                 counter++;
             }
 
-            return Ok(mainDieBag);
+            
+            
+            while(mainDieBag.Count > 0)
+            {
+                var topDie = mainDieBag[0];
+                
+                if(mainDieBag.Count %  2 == 0)
+                {
+                    mainDieBag.RemoveAt(0);
+                    currentGame.playerOneDiceDeck.Add(topDie);
+                }
+                else
+                {
+                    mainDieBag.RemoveAt(0);
+                    currentGame.playerTwoDiceDeck.Add(topDie);
+                }
+            }
+
+            return Ok(currentGame.playerOneDiceDeck);
         }
 
 
