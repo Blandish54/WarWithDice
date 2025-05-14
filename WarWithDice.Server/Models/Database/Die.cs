@@ -24,7 +24,7 @@ namespace WarWithDice.Server.Models.Database
             NumberOfSides = numberOfSides;
         }
 
-        public int RollDice()
+        public int RollDice(Die die)
         {
             NumberRolled = new Random().Next(1, NumberOfSides + 1);
 
