@@ -13,7 +13,7 @@ namespace WarWithDice.Server.Models.Database
 
         public int NumberOfSides { get; set; }
 
-        public int NumberRolled { get; set; }
+        public int LastNumberRolled { get; set; }
 
         public string DieName { get; set; }
 
@@ -24,11 +24,11 @@ namespace WarWithDice.Server.Models.Database
             NumberOfSides = numberOfSides;
         }
 
-        public int RollDice(Die die)
+        public int RollDice()
         {
-            NumberRolled = new Random().Next(1, NumberOfSides + 1);
+            LastNumberRolled = new Random().Next(1, NumberOfSides + 1);
 
-            return NumberRolled;
+            return LastNumberRolled;
         }
 
     }

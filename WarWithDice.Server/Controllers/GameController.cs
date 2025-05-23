@@ -71,47 +71,34 @@ namespace WarWithDice.Server.Controllers
         [HttpGet]
         public IActionResult PlayDiceRound()
         {
-            var playerOneDieBag = currentGame.playerOneDiceDeck;
-            var playerTwoDieBag = currentGame.playerTwoDiceDeck;
-
-            Random random = new Random();
-
             Random dieLocationOne = new Random();
             Random dieLocationTwo = new Random();
 
             bool isWar = false;
 
-            var die1Location = dieLocationOne.Next(1, currentGame.playerOneDiceDeck.Count + 1);
-            var die2Location = dieLocationTwo.Next(1, currentGame.playerTwoDiceDeck.Count + 1);
-
-            die1Location--;
-            die2Location--;
+            var die1Location = dieLocationOne.Next(0, currentGame.playerOneDiceDeck.Count);
+            var die2Location = dieLocationTwo.Next(0, currentGame.playerTwoDiceDeck.Count);
 
             Die playerOneDie = currentGame.playerOneDiceDeck[die1Location];
-
             Die playerTwoDie = currentGame.playerTwoDiceDeck[die2Location];
 
-            playerOneDie.RollDice(playerOneDie);
+            playerOneDie.RollDice();
+            playerTwoDie.RollDice();
 
-            playerTwoDie.RollDice(playerTwoDie);
-
-            if (playerOneDie.NumberRolled > playerTwoDie.NumberRolled)
+            if (playerOneDie.LastNumberRolled > playerTwoDie.LastNumberRolled)
             {
                 currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
-
                 currentGame.playerOneDiceDeck.Add(playerTwoDie);
 
-                return Ok($"Player One Rolled a: {playerOneDie.DieName} for {playerOneDie.NumberRolled} and won the Round vs Player Two :{playerTwoDie.DieName} {playerTwoDie.NumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
+                return Ok($"Player One Rolled a: {playerOneDie.DieName} for {playerOneDie.LastNumberRolled} and won the Round vs Player Two :{playerTwoDie.DieName} {playerTwoDie.LastNumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
             }
-            if (playerTwoDie.NumberRolled > playerOneDie.NumberRolled)
+            if (playerTwoDie.LastNumberRolled > playerOneDie.LastNumberRolled)
             {
                 currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-
                 currentGame.playerTwoDiceDeck.Add(playerOneDie);
 
-                return Ok($"Player Two Rolled a :{playerTwoDie.DieName} for {playerTwoDie.NumberRolled} and won the Round vs Player One Rolled a :{playerOneDie.DieName} for {playerOneDie.NumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
+                return Ok($"Player Two Rolled a :{playerTwoDie.DieName} for {playerTwoDie.LastNumberRolled} and won the Round vs Player One Rolled a :{playerOneDie.DieName} for {playerOneDie.LastNumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
             }
-
             else
             {
                 isWar = true;
@@ -119,159 +106,85 @@ namespace WarWithDice.Server.Controllers
 
             List<Die> playerOneWarBag = new List<Die>();
             List<Die> playerTwoWarBag = new List<Die>();
-             
-           
-            if(isWar)
+
+            List<Die> warPot = new List<Die>();
+            
+            while (isWar)
             {
-
-                Die playerOneWarDie = currentGame.playerOneDiceDeck[die1Location];
-                Die playerTwoWarDie = currentGame.playerOneDiceDeck[die2Location];
-
-                die1Location = dieLocationOne.Next(1, currentGame.playerOneDiceDeck.Count + 1);
-                die1Location--;
-                die2Location = dieLocationTwo.Next(1, currentGame.playerTwoDiceDeck.Count + 1);
-                die2Location--;
-                
-                
-                if(currentGame.playerOneDeck.Count > 0)
+                //build player one war deck
+                while (currentGame.playerOneDiceDeck.Any() && playerOneWarBag.Count <= 4)
                 {
-                    playerOneWarDie = currentGame.playerOneDiceDeck[die1Location];
-                    if (currentGame.playerOneDiceDeck.Count >= 3)
-                    {
-                        die1Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-                        playerOneWarBag.Add(playerOneWarDie);
+                    var randomCardPosition = new Random().Next(0, currentGame.playerOneDiceDeck.Count);
+                    var cardToAddToWarBag = currentGame.playerOneDiceDeck[randomCardPosition];
+                    currentGame.playerOneDeck.RemoveAt(randomCardPosition);
+                    playerOneWarBag.Add(cardToAddToWarBag);
+                }
 
-                        dieLocationOne.Next(1, currentGame.playerOneDiceDeck.Count + 1);
-                        die1Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-                        playerOneWarBag.Add(playerOneWarDie);
-
-                        dieLocationOne.Next(1, currentGame.playerOneDiceDeck.Count + 1);
-                        die1Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-                        playerOneWarBag.Add(playerOneWarDie);
-                    }
-
-                    if (currentGame.playerOneDiceDeck.Count == 2)
-                    {
-                        die1Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-                        playerOneWarBag.Add(playerOneWarDie);
-
-                        dieLocationOne.Next(1, currentGame.playerOneDiceDeck.Count + 1);
-                        die1Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-                        playerOneWarBag.Add(playerOneWarDie);
-                    }
-
-                    if (currentGame.playerOneDiceDeck.Count == 1)
-                    {
-                        die1Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die1Location);
-                        playerOneWarBag.Add(playerOneWarDie);
-                    }
-                    else
-                    {
-                        return Ok("Player One has no Dice to roll or add and thus loses the game.");
-                    }
-                    die1Location = dieLocationOne.Next(1, playerOneWarBag.Count + 1);
-
-                    die1Location--;
-
-                    playerOneWarDie = playerOneWarBag[die1Location];
-
-                    playerOneWarDie.RollDice(playerOneWarDie);
+                //build player two war deck
+                while (currentGame.playerTwoDiceDeck.Any() && playerTwoWarBag.Count <= 4)
+                {
+                    var randomCardPosition = new Random().Next(0, currentGame.playerTwoDiceDeck.Count);
+                    var cardToAddToWarBag = currentGame.playerTwoDiceDeck[randomCardPosition];
+                    currentGame.playerTwoDeck.RemoveAt(randomCardPosition);
+                    playerTwoWarBag.Add(cardToAddToWarBag);
                 }
 
 
-
-                if (currentGame.playerTwoDeck.Count > 0)
+                if (!playerOneWarBag.Any())
                 {
-                    playerTwoWarDie = currentGame.playerOneDiceDeck[die2Location];
-
-                    if (currentGame.playerTwoDiceDeck.Count >= 3)
-                    {
-                        die2Location--;
-                        currentGame.playerOneDiceDeck.RemoveAt(die2Location);
-                        playerTwoWarBag.Add(playerTwoWarDie);
-
-                        dieLocationTwo.Next(1, currentGame.playerTwoDiceDeck.Count + 1);
-                        die2Location--;
-                        currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
-                        playerTwoWarBag.Add(playerTwoWarDie);
-
-                        dieLocationTwo.Next(1, currentGame.playerTwoDiceDeck.Count + 1);
-                        die2Location--;
-                        currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
-                        playerTwoWarBag.Add(playerTwoWarDie);
-                    }
-
-                    if (currentGame.playerTwoDiceDeck.Count == 2)
-                    {
-                        die2Location--;
-                        currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
-                        playerTwoWarBag.Add(playerTwoWarDie);
-
-                        dieLocationTwo.Next(1, currentGame.playerTwoDiceDeck.Count + 1);
-                        die2Location--;
-                        currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
-                        playerTwoWarBag.Add(playerTwoWarDie);
-                    }
-
-                    if (currentGame.playerTwoDiceDeck.Count == 1)
-                    {
-                        die2Location--;
-                        currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
-                        playerTwoWarBag.Add(playerTwoWarDie);
-                    }
-                    else
-                    {
-                        return Ok("Player Two has no dice to roll or add and thus loses the game.");
-                    }
-
-                    die2Location = dieLocationTwo.Next(1, playerTwoWarBag.Count + 1);
-
-                    die2Location--;
-
-                    playerTwoWarDie = playerOneWarBag[die2Location];
-
-                    playerTwoWarDie.RollDice(playerTwoWarDie);
-
-                    if (playerOneWarDie.NumberRolled > playerTwoWarDie.NumberRolled)
-                    {
-                        foreach (Die die in playerTwoWarBag)
-                        {
-                            playerTwoWarBag.RemoveAt(0);
-                            currentGame.playerOneDiceDeck.Add(die);
-                        }
-
-                        isWar = false;
-                        return Ok($"Player One War Bag:{playerOneWarBag} Player Two War Bag: {playerTwoWarBag}  Player One Rolled a: {playerOneWarDie.DieName} for {playerOneWarDie.NumberRolled} vs. Player Two's :{playerTwoWarDie.DieName} For {playerTwoWarDie.NumberRolled} and won War");
-                    }
-                    if (playerTwoWarDie.NumberRolled > playerOneWarDie.NumberRolled)
-                    {
-                        foreach (Die die in playerOneWarBag)
-                        {
-                            playerOneWarBag.RemoveAt(0);
-                            currentGame.playerTwoDiceDeck.Add(die);
-                        }
-
-                        isWar = false;
-                        return Ok($"Player One War Bag:{playerOneWarBag} Player Two War Bag: {playerTwoWarBag}  Player Two Rolled a :{playerTwoWarDie.DieName} for {playerTwoWarDie.NumberRolled} vs. Player One's :{playerOneWarDie.DieName} for {playerOneWarDie.NumberRolled} and won War");
-                    }
-                    else
-                    {
-                        isWar = true;
-                    }
+                    return Ok();
+                    //return game object
+                    //Player one loses, game is over
                 }
+                
+                else if (!playerTwoWarBag.Any())
+                {
+                    return Ok("Player One Wins!");
+                    //return game object
+                    //Player two loses, game is over
+                }
+
+
+                var playerOneWarDieValue = playerOneWarBag.First().RollDice();
+                var playerTwoWarDieValue = playerTwoWarBag.First().RollDice();
+
+                warPot.AddRange(playerOneWarBag);
+                warPot.AddRange(playerTwoWarBag);
+
+                playerOneWarBag.Clear();
+                playerTwoWarBag.Clear();
+                
+                if (playerOneWarDieValue > playerTwoWarDieValue)
+                {
+                    currentGame.playerOneDiceDeck.AddRange(warPot);
+                    warPot.Clear();
+                    return Ok();
+                    //return game object
+                }
+                else if(playerTwoWarDieValue > playerOneWarDieValue)
+                {
+                    return Ok();
+                    currentGame.playerTwoDiceDeck = warPot;
+                    warPot.Clear();
+                    //return game object
+                }
+                else
+                {
+                    continue;
+                    //start loop over
+                }
+
+                //check for war
+                    //repeat loop if war
+                //award dice and end turn
+
             }
-            else
-            {
-                return Ok();
-            }
-            return Ok();
+
+            return NotFound("You should not have gotten to this point");
         }
+
+
+
 
 
         [Route("CreateDeck")]
