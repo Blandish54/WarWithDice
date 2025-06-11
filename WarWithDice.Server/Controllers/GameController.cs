@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc;
 using WarWithDice.Server.Models;
+using WarWithDice.Server.Models.Client;
 using WarWithDice.Server.Models.Database;
 
 namespace WarWithDice.Server.Controllers
@@ -63,14 +64,29 @@ namespace WarWithDice.Server.Controllers
                 }
             }
 
-            return Ok(currentGame);
+            return Ok();
         }
 
 
         [Route("PlayDiceRound")]
         [HttpGet]
-        public IActionResult PlayDiceRound()
+        public ActionResult<PlayDiceRoundResponse> PlayDiceRound()
         {
+            var playDiceRoundResponse = new PlayDiceRoundResponse();
+
+            playDiceRoundResponse.PlayerOneDiceTotal = currentGame.playerOneDiceDeck.Count;
+            playDiceRoundResponse.PlayerTwoDiceTotal = currentGame.playerTwoDiceDeck.Count;
+
+            if (!currentGame.playerOneDiceDeck.Any())
+            {
+                playDiceRoundResponse.WhoWon = "Player Two Wins!";
+                return playDiceRoundResponse;
+            }
+            if (!currentGame.playerTwoDiceDeck.Any())
+            {
+                playDiceRoundResponse.WhoWon = "Player One Wins!";
+                return playDiceRoundResponse;
+            }
             Random dieLocationOne = new Random();
             Random dieLocationTwo = new Random();
 
@@ -82,25 +98,32 @@ namespace WarWithDice.Server.Controllers
             Die playerOneDie = currentGame.playerOneDiceDeck[die1Location];
             Die playerTwoDie = currentGame.playerTwoDiceDeck[die2Location];
 
-            playerOneDie.RollDice();
-            playerTwoDie.RollDice();
+            playDiceRoundResponse.PlayerOneDiceRoll = playerOneDie.RollDice();
+            playDiceRoundResponse.PlayerTwoDiceRoll = playerTwoDie.RollDice();
+
+            playDiceRoundResponse.PlayerOneDieName = playerOneDie.DieName;
+            playDiceRoundResponse.PlayerTwoDieName = playerTwoDie.DieName;
 
             if (playerOneDie.LastNumberRolled > playerTwoDie.LastNumberRolled)
             {
                 currentGame.playerTwoDiceDeck.RemoveAt(die2Location);
                 currentGame.playerOneDiceDeck.Add(playerTwoDie);
 
-                return Ok($"Player One Rolled a: {playerOneDie.DieName} for {playerOneDie.LastNumberRolled} and won the Round vs Player Two :{playerTwoDie.DieName} {playerTwoDie.LastNumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
+                playDiceRoundResponse.RoundOutcome = ($"Player One Rolled a: {playerOneDie.DieName} for {playerOneDie.LastNumberRolled} and won the Round vs Player Two :{playerTwoDie.DieName} {playerTwoDie.LastNumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
+
             }
             if (playerTwoDie.LastNumberRolled > playerOneDie.LastNumberRolled)
             {
                 currentGame.playerOneDiceDeck.RemoveAt(die1Location);
                 currentGame.playerTwoDiceDeck.Add(playerOneDie);
 
-                return Ok($"Player Two Rolled a :{playerTwoDie.DieName} for {playerTwoDie.LastNumberRolled} and won the Round vs Player One Rolled a :{playerOneDie.DieName} for {playerOneDie.LastNumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
+                playDiceRoundResponse.RoundOutcome = ($"Player Two Rolled a :{playerTwoDie.DieName} for {playerTwoDie.LastNumberRolled} and won the Round vs Player One Rolled a :{playerOneDie.DieName} for {playerOneDie.LastNumberRolled}! Player One has {currentGame.playerOneDiceDeck.Count} dice. Player Two has {currentGame.playerTwoDiceDeck.Count} dice");
+               
             }
+
             else
             {
+                playDiceRoundResponse.RoundOutcome = $"Player One Rolled a :{playerOneDie.DieName} for {playerOneDie.LastNumberRolled} and Player Two Rolled a :{playerTwoDie.DieName} for {playerTwoDie.LastNumberRolled} which means WAR!!";
                 isWar = true;
             }
 
@@ -111,42 +134,49 @@ namespace WarWithDice.Server.Controllers
             
             while (isWar)
             {
-                //build player one war deck
                 while (currentGame.playerOneDiceDeck.Any() && playerOneWarBag.Count <= 4)
                 {
                     var randomCardPosition = new Random().Next(0, currentGame.playerOneDiceDeck.Count);
                     var cardToAddToWarBag = currentGame.playerOneDiceDeck[randomCardPosition];
-                    currentGame.playerOneDeck.RemoveAt(randomCardPosition);
+                    currentGame.playerOneDiceDeck.RemoveAt(randomCardPosition);
                     playerOneWarBag.Add(cardToAddToWarBag);
                 }
 
-                //build player two war deck
+                
                 while (currentGame.playerTwoDiceDeck.Any() && playerTwoWarBag.Count <= 4)
                 {
                     var randomCardPosition = new Random().Next(0, currentGame.playerTwoDiceDeck.Count);
                     var cardToAddToWarBag = currentGame.playerTwoDiceDeck[randomCardPosition];
-                    currentGame.playerTwoDeck.RemoveAt(randomCardPosition);
+                    currentGame.playerTwoDiceDeck.RemoveAt(randomCardPosition);
                     playerTwoWarBag.Add(cardToAddToWarBag);
                 }
 
 
                 if (!playerOneWarBag.Any())
                 {
-                    return Ok();
-                    //return game object
-                    //Player one loses, game is over
+                    playDiceRoundResponse.WhoWon = "Player Two Wins!";
+                    playDiceRoundResponse.RoundOutcome = "Player One has no dice and has lost";
+
                 }
                 
                 else if (!playerTwoWarBag.Any())
                 {
-                    return Ok("Player One Wins!");
-                    //return game object
-                    //Player two loses, game is over
-                }
+                    playDiceRoundResponse.WhoWon = "Player One Wins!";
+                    playDiceRoundResponse.RoundOutcome = "Player Two has no dice and has lost";
 
+                }
+                // When a player wins we need to at the die properties and add them to the model
+                //send over the list as well to the client
+
+                playDiceRoundResponse.PlayerOneDieName = playerOneWarBag.First().DieName;
+                playDiceRoundResponse.PlayerTwoDieName = playerTwoWarBag.First().DieName;
 
                 var playerOneWarDieValue = playerOneWarBag.First().RollDice();
                 var playerTwoWarDieValue = playerTwoWarBag.First().RollDice();
+
+                playDiceRoundResponse.PlayerOneDiceRoll = playerOneWarBag.First().LastNumberRolled;
+                playDiceRoundResponse.PlayerTwoDiceRoll = playerTwoWarBag.First().LastNumberRolled;
+
 
                 warPot.AddRange(playerOneWarBag);
                 warPot.AddRange(playerTwoWarBag);
@@ -158,15 +188,20 @@ namespace WarWithDice.Server.Controllers
                 {
                     currentGame.playerOneDiceDeck.AddRange(warPot);
                     warPot.Clear();
-                    return Ok();
-                    //return game object
+
+                    playDiceRoundResponse.RoundOutcome = $"During WAR Player One Rolled a :{playDiceRoundResponse.PlayerOneDieName} for {playDiceRoundResponse.PlayerOneDiceRoll} vs Player Two's :{playDiceRoundResponse.PlayerTwoDieName} for {playDiceRoundResponse.PlayerTwoDiceRoll}";
+                    return playDiceRoundResponse;
+                    
                 }
                 else if(playerTwoWarDieValue > playerOneWarDieValue)
                 {
-                    return Ok();
-                    currentGame.playerTwoDiceDeck = warPot;
+
+                    currentGame.playerTwoDiceDeck.AddRange(warPot);
                     warPot.Clear();
-                    //return game object
+
+                    playDiceRoundResponse.RoundOutcome = $"During WAR Player Two Rolled a :{playDiceRoundResponse.PlayerTwoDieName} for {playDiceRoundResponse.PlayerTwoDiceRoll} vs Player One's :{playDiceRoundResponse.PlayerOneDieName} for {playDiceRoundResponse.PlayerOneDiceRoll}";
+                    return playDiceRoundResponse;
+                    
                 }
                 else
                 {
